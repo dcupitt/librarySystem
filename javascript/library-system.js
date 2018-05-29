@@ -5,6 +5,8 @@
   /*==================librarySystem==================*/
   function librarySystem(libraryName, dependencies, callback) {
     if (arguments.length > 1) {
+      // Check that second argument is an Array
+      arrayTest(dependencies);
   		// Store library if not created
       storeLibrary(libraryName, dependencies, callback);
   	}
@@ -15,13 +17,20 @@
   };
 
   /* ======= Helper Functions ======= */
+  // Check that second argument is an Array
+  function arrayTest (dependencies) {
+    if (Array.isArray(dependencies) === false) {
+      throw new Error('Given argument is not an array');
+    }
+  };
+
   // Store library as object on the libraryStorage object
   function storeLibrary (libraryName, dependencies, callback) {
     libraryStorage[libraryName] = {
       dependencies: dependencies,
       callback: callback,
     };
-  }
+  };
 
   // Runs a series of checks on the library before returning the library with all of it's dependencies
   function loadLibrary(libraryName) {
@@ -143,10 +152,21 @@ tests({
     librarySystem('favourites');
     librarySystem('favourites');
     eq(numberOfTimesCallbackHasRun, 1);
-  }
+  },
 
-  // 'It should throw an error if something other than an array is parsed in.': function() {
-  //   fail();
-  // }
+  'It should throw an error if something other than an array is parsed in.': function() {
+    function testForErrors () {
+      var errors = 0;
+      try {
+        librarySystem('noArray', 1, function() {
+          return 'I forgot to put my dependencies as an array.';
+        });
+      } catch (e) {
+        errors++;
+      }
+      return errors;
+    }
+    eq(testForErrors(), 1);
+  }
 
 });
